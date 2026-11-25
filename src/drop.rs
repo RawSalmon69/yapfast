@@ -12,6 +12,10 @@ use std::path::PathBuf;
         reason = "on Windows the window has iced's own drag events and asks only where the pointer is"
     )
 )]
+#[cfg_attr(
+    target_os = "macos",
+    allow(dead_code, reason = "on macOS the window has iced's own drag events")
+)]
 pub enum Drag {
     /// Files came over the window.
     Entered,
@@ -43,6 +47,15 @@ enum Source {
 
 impl Pointer {
     /// For `window`, whose physical pixels are `scale` of its logical ones.
+    #[cfg_attr(
+        target_os = "macos",
+        allow(
+            unused_imports,
+            unused_variables,
+            unreachable_code,
+            reason = "macOS has no source to ask, so this returns None"
+        )
+    )]
     pub fn of(
         window: &(impl raw_window_handle::HasWindowHandle + ?Sized),
         scale: f64,
@@ -73,6 +86,13 @@ impl Pointer {
     }
 
     /// Where it is now, unless the platform won't say.
+    #[cfg_attr(
+        target_os = "macos",
+        allow(
+            unreachable_code,
+            reason = "macOS has no source to ask, so this returns None"
+        )
+    )]
     pub fn at(&self) -> Option<Drag> {
         let (x, y): (f64, f64) = match &self.source {
             #[cfg(target_os = "linux")]

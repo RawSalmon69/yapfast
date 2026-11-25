@@ -126,6 +126,7 @@ pub(super) fn access_for(status: AVAuthorizationStatus) -> Access {
 /// Fails unless the camera may be used, asking the person once when they
 /// have not been asked.
 fn ensure_authorized() -> Result<()> {
+    // SAFETY: a constant of AVFoundation.
     let media = unsafe { AVMediaTypeVideo }.context("AVFoundation has no video media type")?;
     // SAFETY: a plain class method with a valid media type.
     let status = unsafe { AVCaptureDevice::authorizationStatusForMediaType(media) };
@@ -176,6 +177,7 @@ fn device_types() -> Retained<NSArray<objc2_av_foundation::AVCaptureDeviceType>>
 }
 
 fn video_devices() -> Vec<Retained<AVCaptureDevice>> {
+    // SAFETY: a constant of AVFoundation.
     let Some(media) = (unsafe { AVMediaTypeVideo }) else {
         tracing::error!("AVFoundation has no video media type");
         return vec![];

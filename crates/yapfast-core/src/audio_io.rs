@@ -389,6 +389,10 @@ pub struct Input<S: Sample> {
     _samples: PhantomData<S>,
 }
 
+#[allow(
+    clippy::large_enum_variant,
+    reason = "one lives for each open microphone, so boxing would only add an allocation"
+)]
 enum InputStream {
     Device(platform::Input),
     Silent(silent::Input),

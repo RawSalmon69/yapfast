@@ -208,7 +208,10 @@ impl Matcher {
 
     /// The desktop says a keybind went down or came up, as the portal does,
     /// having matched its keys itself.
-    #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
+    #[cfg_attr(
+        not(target_os = "linux"),
+        allow(dead_code, reason = "only Linux's portal matches keybinds itself")
+    )]
     fn set(&mut self, binding: usize, down: bool, out: Out<'_>) {
         let Some(compiled) = self.bindings.get(binding) else {
             return;

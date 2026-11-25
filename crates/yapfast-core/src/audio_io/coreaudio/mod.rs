@@ -131,7 +131,7 @@ pub fn others(
         move || {
             ended(super::Heard::Stopped {
                 source: MIXED_SOURCE,
-            })
+            });
         },
         stop,
     )

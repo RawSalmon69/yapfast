@@ -20,6 +20,10 @@ pub enum Clipboard {
 }
 
 /// Picture types Discord shows inline, best first, with their extensions.
+#[cfg_attr(
+    not(any(target_os = "linux", windows)),
+    allow(dead_code, reason = "elsewhere arboard reads the clipboard")
+)]
 const PICTURES: [(&str, &str); 4] = [
     ("image/png", "png"),
     ("image/gif", "gif"),
@@ -584,7 +588,10 @@ fn bitmap(dib: &[u8]) -> Option<image::RgbaImage> {
 }
 
 /// The existing local files a `text/uri-list` names.
-#[cfg_attr(not(target_os = "linux"), allow(dead_code))]
+#[cfg_attr(
+    not(target_os = "linux"),
+    allow(dead_code, reason = "only Linux's clipboards list files as text")
+)]
 pub fn files(list: &str) -> Vec<PathBuf> {
     list.lines()
         .map(str::trim)

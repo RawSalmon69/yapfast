@@ -234,6 +234,7 @@ impl Content {
             .iter()
             .map(|application| {
                 (
+                    // SAFETY: a plain property read on a listed object.
                     unsafe { application.applicationName() }.to_string(),
                     application,
                 )

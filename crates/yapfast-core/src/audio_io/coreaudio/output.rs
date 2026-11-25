@@ -149,7 +149,7 @@ impl Output {
         Ok(())
     }
 
-    pub fn flush(&mut self) {
+    pub fn flush(&self) {
         self.signals.flush.store(true, Ordering::Release);
         let until = Instant::now() + FLUSH_WITHIN;
         while self.signals.flush.load(Ordering::Acquire) && Instant::now() < until {

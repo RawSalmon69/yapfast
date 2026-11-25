@@ -213,7 +213,13 @@ pub fn shareable() -> Vec<Shareable> {
     listed
 }
 
-#[cfg_attr(target_os = "macos", allow(unreachable_code))]
+#[cfg_attr(
+    target_os = "macos",
+    allow(
+        unreachable_code,
+        reason = "macOS returns ScreenCaptureKit's list before the other systems' code"
+    )
+)]
 fn screens_and_windows() -> Vec<Shareable> {
     // macOS lists them through ScreenCaptureKit, which captures them too.
     #[cfg(target_os = "macos")]
@@ -1139,7 +1145,14 @@ impl Capture {
     /// Starts capturing `source`, fitting its frames in `max_width` by
     /// `max_height`; where [`portal_picks`], a screen or window the system's
     /// dialog picks.
-    #[cfg_attr(target_os = "macos", allow(unreachable_code, unused_variables))]
+    #[cfg_attr(
+        target_os = "macos",
+        allow(
+            unreachable_code,
+            unused_variables,
+            reason = "macOS returns through ScreenCaptureKit before the other systems' code"
+        )
+    )]
     fn start(
         source: Source,
         sink: &Arc<Mutex<Sink>>,
@@ -1383,7 +1396,14 @@ fn glance(
 }
 
 /// A picture of the screen listed by `id`, at its own size.
-#[cfg_attr(target_os = "macos", allow(unreachable_code, unused_variables))]
+#[cfg_attr(
+    target_os = "macos",
+    allow(
+        unreachable_code,
+        unused_variables,
+        reason = "macOS returns through ScreenCaptureKit before the other systems' code"
+    )
+)]
 fn glance_at(id: u64, stop: &AtomicBool) -> Result<Option<I420Buffer>> {
     #[cfg(target_os = "macos")]
     return screen_kit::glance(id, stop);

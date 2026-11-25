@@ -240,8 +240,8 @@ impl Stream {
         // SAFETY: the handler is copied by the call and may run on any thread.
         unsafe {
             self.stream
-                .startCaptureWithCompletionHandler(Some(&handler))
-        };
+                .startCaptureWithCompletionHandler(Some(&handler));
+        }
         wait_for(&answered, START_TIMEOUT, "start screen capture")
     }
 }

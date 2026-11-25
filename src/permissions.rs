@@ -86,7 +86,7 @@ pub fn ask_once(root: &Path) {
         .name("yapfast-permissions".into())
         .spawn(move || {
             // A panic in a system callback must not take the app with it.
-            if std::panic::catch_unwind(|| run_round()).is_err() {
+            if std::panic::catch_unwind(run_round).is_err() {
                 tracing::error!("the permission round panicked");
                 return;
             }

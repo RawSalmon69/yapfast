@@ -6,6 +6,13 @@
 //! Explorer, and the window loads the same one. Each window toolkit gives
 //! its windows these as it makes them.
 
+#[cfg_attr(
+    not(target_os = "linux"),
+    allow(
+        unused_imports,
+        reason = "only Linux names its desktop entry and icon by the app ID"
+    )
+)]
 pub use crate::APP_ID;
 
 /// A picture as straight (not premultiplied) RGBA, four bytes a pixel.
