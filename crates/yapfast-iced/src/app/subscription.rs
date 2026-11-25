@@ -39,18 +39,7 @@ impl App {
             ) => Some(Message::Shell(crate::shell::Event::Resized(size))),
             _ => None,
         });
-        // Ctrl with + or - zooms wherever the keys are.
-        let zooms = iced::event::listen_with(|event, _, _| match event {
-            iced::Event::Keyboard(keyboard::Event::KeyPressed {
-                key,
-                physical_key,
-                modifiers,
-                ..
-            }) if modifiers.control() && !modifiers.alt() => {
-                Some(Message::Shell(crate::shell::Event::Zoom(key, physical_key)))
-            }
-            _ => None,
-        });
+        let zooms = iced::event::listen_with(zoom_key);
         let mut subscriptions = vec![
             keys,
             fonts,
@@ -72,30 +61,8 @@ impl App {
                 Message::Shell(crate::shell::Event::Heard(crate::desktop::Heard::Updates))
             }));
         }
-        // Ctrl+K opens the quick switcher wherever the keys are, and Ctrl+F
-        // or Ctrl+Shift+F goes to the conversation's search, as Discord's
-        // binds are: Ctrl+F fills in a server channel's `in:` first.
         if crate::signin::workspace(self) {
-            subscriptions.push(iced::event::listen_with(|event, _, _| match event {
-                iced::Event::Keyboard(keyboard::Event::KeyPressed {
-                    key,
-                    physical_key,
-                    modifiers,
-                    repeat: false,
-                    ..
-                }) if modifiers.control() && !modifiers.alt() => {
-                    if is_letter(&key, physical_key, "k", key::Code::KeyK) && !modifiers.shift() {
-                        Some(Message::Switcher(crate::switcher::Event::Toggle))
-                    } else if is_letter(&key, physical_key, "f", key::Code::KeyF) {
-                        Some(Message::Search(crate::search::Event::Focus {
-                            channel: !modifiers.shift(),
-                        }))
-                    } else {
-                        None
-                    }
-                }
-                _ => None,
-            }));
+            subscriptions.push(iced::event::listen_with(workspace_key));
         }
         // A dialog's field keeps Escape to itself, only letting go of the
         // keys: while a dialog with one is open, Escape closes the dialog.
@@ -148,6 +115,51 @@ impl App {
     }
 }
 
+/// Ctrl (Cmd on macOS) with + or - zooms wherever the keys are.
+fn zoom_key(event: iced::Event, _: iced::event::Status, _: iced::window::Id) -> Option<Message> {
+    match event {
+        iced::Event::Keyboard(keyboard::Event::KeyPressed {
+            key,
+            physical_key,
+            modifiers,
+            ..
+        }) if modifiers.command() && !modifiers.alt() => {
+            Some(Message::Shell(crate::shell::Event::Zoom(key, physical_key)))
+        }
+        _ => None,
+    }
+}
+
+/// Ctrl+K (Cmd+K on macOS) opens the quick switcher wherever the keys are,
+/// and Ctrl+F or Ctrl+Shift+F goes to the conversation's search, as
+/// Discord's binds are: Ctrl+F fills in a server channel's `in:` first.
+fn workspace_key(
+    event: iced::Event,
+    _: iced::event::Status,
+    _: iced::window::Id,
+) -> Option<Message> {
+    match event {
+        iced::Event::Keyboard(keyboard::Event::KeyPressed {
+            key,
+            physical_key,
+            modifiers,
+            repeat: false,
+            ..
+        }) if modifiers.command() && !modifiers.alt() => {
+            if is_letter(&key, physical_key, "k", key::Code::KeyK) && !modifiers.shift() {
+                Some(Message::Switcher(crate::switcher::Event::Toggle))
+            } else if is_letter(&key, physical_key, "f", key::Code::KeyF) {
+                Some(Message::Search(crate::search::Event::Focus {
+                    channel: !modifiers.shift(),
+                }))
+            } else {
+                None
+            }
+        }
+        _ => None,
+    }
+}
+
 /// The key of a shortcut's letter, `letter` in lower case: that letter in
 /// the keyboard's layout, or in a layout without Latin letters (Cyrillic,
 /// Greek, Thai), the key in its place, `code`.
@@ -164,9 +176,9 @@ fn is_letter(key: &keyboard::Key, physical: key::Physical, letter: &str, code: k
 
 #[cfg(test)]
 mod tests {
-    use iced::keyboard::{Key, key};
+    use iced::keyboard::{self, Key, key};
 
-    use super::is_letter;
+    use super::{Message, is_letter, workspace_key, zoom_key};
 
     #[test]
     fn a_shortcuts_letter_is_the_key_in_its_place_where_the_layout_has_no_latin_letters() {
@@ -198,6 +210,39 @@ mod tests {
             k,
             "f",
             key::Code::KeyF
+        ));
+    }
+
+    /// `key`, in `code`'s place, pressed with Ctrl (Cmd on macOS).
+    fn command(key: &str, code: key::Code) -> iced::Event {
+        let key = Key::Character(key.into());
+        iced::Event::Keyboard(keyboard::Event::KeyPressed {
+            key: key.clone(),
+            modified_key: key,
+            physical_key: key::Physical::Code(code),
+            location: keyboard::Location::Standard,
+            modifiers: keyboard::Modifiers::COMMAND,
+            repeat: false,
+            text: None,
+        })
+    }
+
+    #[test]
+    fn ctrl_k_f_and_plus_are_cmd_on_macos() {
+        let (status, window) = (iced::event::Status::Ignored, iced::window::Id::unique());
+        assert!(matches!(
+            workspace_key(command("k", key::Code::KeyK), status, window),
+            Some(Message::Switcher(crate::switcher::Event::Toggle))
+        ));
+        assert!(matches!(
+            workspace_key(command("f", key::Code::KeyF), status, window),
+            Some(Message::Search(crate::search::Event::Focus {
+                channel: true
+            }))
+        ));
+        assert!(matches!(
+            zoom_key(command("=", key::Code::Equal), status, window),
+            Some(Message::Shell(crate::shell::Event::Zoom(..)))
         ));
     }
 }
