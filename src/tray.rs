@@ -614,9 +614,7 @@ mod macos {
     use image::ImageEncoder;
     use objc2::{
         AllocAnyThread, DefinedClass, MainThreadMarker, MainThreadOnly, define_class, msg_send,
-        rc::Retained,
-        runtime::AnyObject,
-        sel,
+        rc::Retained, runtime::AnyObject, sel,
     };
     use objc2_app_kit::{
         NSApplication, NSImage, NSMenu, NSMenuItem, NSStatusBar, NSStatusItem,
@@ -688,8 +686,8 @@ mod macos {
                 return None;
             };
             let icons = [icon(false)?, icon(true)?];
-            let item = NSStatusBar::systemStatusBar()
-                .statusItemWithLength(NSVariableStatusItemLength);
+            let item =
+                NSStatusBar::systemStatusBar().statusItemWithLength(NSVariableStatusItemLength);
             let tray = Self {
                 mtm,
                 item,

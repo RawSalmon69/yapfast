@@ -56,7 +56,6 @@ use windows as platform;
 #[cfg(windows)]
 pub(crate) use windows::set_string;
 
-
 /// `discord://` links on macOS. LaunchServices hands a link to the running
 /// Yapfast, or starts it with the link, as an Apple Event (`GURL`) instead of
 /// as an argument or through the instance socket; this takes it from there.
@@ -65,7 +64,9 @@ pub mod apple_event {
     use std::sync::Mutex;
 
     use objc2::{define_class, msg_send, rc::Retained, sel};
-    use objc2_foundation::{NSAppleEventDescriptor, NSAppleEventManager, NSObject, NSObjectProtocol};
+    use objc2_foundation::{
+        NSAppleEventDescriptor, NSAppleEventManager, NSObject, NSObjectProtocol,
+    };
 
     /// Where links go, once the window's event loop is listening.
     pub type Sink = Box<dyn Fn(String) + Send>;
