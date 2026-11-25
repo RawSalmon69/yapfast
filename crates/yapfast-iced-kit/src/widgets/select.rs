@@ -506,7 +506,7 @@ mod tests {
         mouse(ui, to, mouse::Event::ButtonReleased(mouse::Button::Left));
     }
 
-    /// Ctrl with a letter, and whether something took it.
+    /// Ctrl (Cmd on macOS) with a letter, and whether something took it.
     fn ctrl(ui: &mut Simulator<'_, Message>, letter: &str) -> iced::event::Status {
         let key = keyboard::Key::Character(letter.into());
         ui.simulate([Event::Keyboard(keyboard::Event::KeyPressed {
@@ -514,7 +514,7 @@ mod tests {
             modified_key: key,
             physical_key: key::Physical::Unidentified(key::NativeCode::Unidentified),
             location: keyboard::Location::Standard,
-            modifiers: keyboard::Modifiers::CTRL,
+            modifiers: keyboard::Modifiers::COMMAND,
             repeat: false,
             text: None,
         })])[0]

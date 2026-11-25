@@ -173,7 +173,7 @@ fn ctrl_g_closes_the_gif_picker_its_search_passing_it_on() {
             modified_key: g.clone(),
             physical_key: key::Physical::Code(key::Code::KeyG),
             location: keyboard::Location::Standard,
-            modifiers: keyboard::Modifiers::CTRL,
+            modifiers: keyboard::Modifiers::COMMAND,
             repeat: false,
             text: None,
         })]);
@@ -184,12 +184,12 @@ fn ctrl_g_closes_the_gif_picker_its_search_passing_it_on() {
         "the field passes it on"
     );
     let on_g = key::Physical::Code(key::Code::KeyG);
-    let _ = app.update(Message::Pressed(g, keyboard::Modifiers::CTRL, on_g));
+    let _ = app.update(Message::Pressed(g, keyboard::Modifiers::COMMAND, on_g));
     assert!(app.win.picker.get().is_none(), "Ctrl+G closed it");
     // A Russian layout's key in G's place closes it as it opened it.
     gifs_open(&mut app);
     let pe = keyboard::Key::Character("п".into());
-    let _ = app.update(Message::Pressed(pe, keyboard::Modifiers::CTRL, on_g));
+    let _ = app.update(Message::Pressed(pe, keyboard::Modifiers::COMMAND, on_g));
     assert!(
         app.win.picker.get().is_none(),
         "the key in G's place closed it"

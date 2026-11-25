@@ -1121,7 +1121,7 @@ fn select_and_copy(app: &mut App, line: iced::Rectangle) -> (Vec<String>, iced::
             modified_key: c.clone(),
             physical_key: physical,
             location: keyboard::Location::Standard,
-            modifiers: keyboard::Modifiers::CTRL,
+            modifiers: keyboard::Modifiers::COMMAND,
             repeat: false,
             text: None,
         })])[0];
@@ -1134,7 +1134,7 @@ fn select_and_copy(app: &mut App, line: iced::Rectangle) -> (Vec<String>, iced::
     if status == iced::event::Status::Ignored {
         written.extend(clipboard_writes(app.update(Message::Pressed(
             c,
-            keyboard::Modifiers::CTRL,
+            keyboard::Modifiers::COMMAND,
             physical,
         ))));
     }
