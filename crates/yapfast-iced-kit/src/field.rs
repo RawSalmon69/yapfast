@@ -272,11 +272,13 @@ pub enum Typed {
 }
 
 impl Typed {
-    /// What a key nothing took writes, if it writes: text without Ctrl
-    /// (AltGr's is), Space, Backspace or Delete. Enter isn't one: Discord's
+    /// What a key nothing took writes, if it writes: text without Ctrl or
+    /// Cmd (AltGr's is), Space, Backspace or Delete. Enter isn't one: Discord's
     /// sends the draft, which a stray press after a menu closes shouldn't.
     pub fn of(key: &key::Key, modifiers: keyboard::Modifiers) -> Option<Self> {
-        if (modifiers.command() && !modifiers.alt()) || modifiers.logo() {
+        // Ctrl, not command(): on macOS that is Cmd, which logo() covers,
+        // and Ctrl+X still comes with its letter as the key.
+        if (modifiers.control() && !modifiers.alt()) || modifiers.logo() {
             return None;
         }
         match key.as_ref() {

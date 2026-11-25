@@ -322,7 +322,7 @@ fn ctrl_v_with_nothing_focused_pastes_in_the_composer() {
     let paste = |app: &mut crate::app::App| {
         app.update(Message::Key(
             keyboard::Key::Character("v".into()),
-            keyboard::Modifiers::CTRL,
+            keyboard::Modifiers::COMMAND,
         ))
         .units()
     };
